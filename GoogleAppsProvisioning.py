@@ -1,16 +1,20 @@
 adminUser = 'david.hay'
 adminPassword = 'badpassword' #obviously this is an insecure way to store your admin password
+csvFile = 'powerschoolexport.csv'
 
 import time
 import csv
 import gdata.apps.service
 
-importFile = open('powerschoolexport.csv', 'rb') #open the CSV file that we want to parse
-reader = csv.reader(importFile) #we'll read the CSV file with this
-totalRows = sum(1 for row in importFile) #count how many rows there are in the CSV file
-currentRow = 6 #a variable we'll decrement for keeping track of where we are in the CSV file
+totalRows = sum(1 for row in open(csvFile, 'rb')) #count how many rows there are in the CSV file
+print 'There are ', totalRows, ' entries in ', csvFile
+countDown = totalRows #a variable we'll decrement as a count down to completion
+currentRow = 0 #for keeping track of where we are in the CSV file
 logFileName = 'GoogleAppsProvisioningScript' + time.strftime('%Y-%m-%d_%H%M%S') + '.txt' #build a name for the log file
 logFile = open(logFileName, 'a') #create and open a log file that we'll append to
+
+importFile = open(csvFile, 'rb') #(re)open the CSV file that we want to parse (since totalRows already looped through it)
+reader = csv.reader(importFile) #we'll read the CSV file with this
 
 def createUser(email, firstname, lastname, userPassword): #a function for creating a user account
     domainIndex = email.find('@') #where is the @ at?
@@ -38,11 +42,12 @@ for row in reader: #the loop that reads through the CSV file we mentioned earlie
     if currentRow > 0: #because we'll assume that the first row contains column titles, otherwise use >-1 or omit this line
         result = createUser(email, firstname, lastname, userPassword) #call the function to create a User
         rowString = str(rowNumber) #convert that rowNumber integer to a string so we can concatenate it
-        print 'Row number ' + rowString + ' parsed' #print to the console, in case anyone is watching
+        #print countDown + '(row number ' + rowString + ' parsed)' #print to the console, in case anyone is watching
+        print countDown, '(row number ', rowNumber, ' parsed)'
         logFile.write(rowString + time.strftime('%Y-%m-%d_%H:%M:%S') + ' ' + email + ' ') #log the date/time and email we tried to create
         logFile.write(str(result)) #log the result of that function
         logFile.write( '\n') #write a new line to the log file
-    rowNumber += 1 #increment the rownumber variable
+    currentRow += 1 #increment the rowNumber variable
 
 #close the files
 importFile.close()
