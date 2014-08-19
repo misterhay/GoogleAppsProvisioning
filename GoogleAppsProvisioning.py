@@ -1,5 +1,5 @@
 adminUser = 'david.hay'
-adminPassword = 'badpassword' #obviously this is an insecure way to store your admin password
+adminPassword = 'weakpassword' #obviously this is an insecure way to store your admin password
 csvFile = 'powerschoolexport.csv'
 
 import time
@@ -10,6 +10,7 @@ totalRows = sum(1 for row in open(csvFile, 'rb')) #count how many rows there are
 print 'There are ', totalRows, ' entries in ', csvFile
 countDown = totalRows #a variable we'll decrement as a count down to completion
 currentRow = 0 #for keeping track of where we are in the CSV file
+
 logFileName = 'GoogleAppsProvisioningScript' + time.strftime('%Y-%m-%d_%H%M%S') + '.txt' #build a name for the log file
 logFile = open(logFileName, 'a') #create and open a log file that we'll append to
 
@@ -23,9 +24,9 @@ def createUser(email, firstname, lastname, userPassword): #a function for creati
     service = gdata.apps.service.AppsService(email=adminUser+'@'+domain, domain=domain, password=adminPassword)
     service.ProgrammaticLogin() #log in to the Google Apps domain
     try: #as long as there are no errors
-#        result = service.CreateUser(username, lastname, firstname, userPassword) #create the user account
-        service.RetrieveUser(username) #for testing we will check if user exists
-        result = 'created successfully'
+        result = service.CreateUser(username, lastname, firstname, userPassword) #create the user account
+#        service.RetrieveUser(username) #for testing we will check if user exists
+#        result = 'created successfully'
     except gdata.apps.service.AppsForYourDomainException , e: #if there is an error
         eString = str(e) #convert the error to a string
         errorStart = eString.find('reason="') + 8 #find the start of the error
@@ -41,13 +42,14 @@ for row in reader: #the loop that reads through the CSV file we mentioned earlie
     userPassword = row[3]
     if currentRow > 0: #because we'll assume that the first row contains column titles, otherwise use >-1 or omit this line
         result = createUser(email, firstname, lastname, userPassword) #call the function to create a User
-        rowString = str(rowNumber) #convert that rowNumber integer to a string so we can concatenate it
+        rowString = str(currentRow) #convert that currentRow integer to a string so we can concatenate it
         #print countDown + '(row number ' + rowString + ' parsed)' #print to the console, in case anyone is watching
-        print countDown, '(row number ', rowNumber, ' parsed)'
+        print countDown, '(row number ', currentRow, ' parsed)'
         logFile.write(rowString + time.strftime('%Y-%m-%d_%H:%M:%S') + ' ' + email + ' ') #log the date/time and email we tried to create
         logFile.write(str(result)) #log the result of that function
         logFile.write( '\n') #write a new line to the log file
-    currentRow += 1 #increment the rowNumber variable
+    currentRow += 1 #increment the currentRow variable
+    countDown -= 1 #decrement the countDown variable
 
 #close the files
 importFile.close()
