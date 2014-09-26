@@ -1,6 +1,7 @@
-adminUser = 'david.hay'
-adminPassword = 'weakpassword' #obviously this is an insecure way to store your admin password
-csvFile = 'powerschoolexport.csv'
+adminUser = raw_input('Enter the admin username, without the domain (e.g. dhay):')
+adminPassword = raw_input('Enter the admin password: ')
+print "\n" * 80 #clear screen
+csvFile = 'EIPSTeacherGoogleAppsAccounts2014-08-26.csv'
 
 import time
 import csv
@@ -12,7 +13,7 @@ countDown = totalRows #a variable we'll decrement as a count down to completion
 currentRow = 0 #for keeping track of where we are in the CSV file
 
 logFileName = 'GoogleAppsProvisioningScript' + time.strftime('%Y-%m-%d_%H%M%S') + '.txt' #build a name for the log file
-logFile = open(logFileName, 'a') #create and open a log file that we'll append to
+logFile = open(logFileName, 'a') #create and/or open a log file that we'll append to
 
 importFile = open(csvFile, 'rb') #(re)open the CSV file that we want to parse (since totalRows already looped through it)
 reader = csv.reader(importFile) #we'll read the CSV file with this
@@ -21,12 +22,16 @@ def createUser(email, firstname, lastname, userPassword): #a function for creati
     domainIndex = email.find('@') #where is the @ at?
     username = email[:domainIndex] #the username is the stuff before the @
     domain = email[domainIndex+1:] #the domain is the stuff after the @
+
     service = gdata.apps.service.AppsService(email=adminUser+'@'+domain, domain=domain, password=adminPassword)
     service.ProgrammaticLogin() #log in to the Google Apps domain
     try: #as long as there are no errors
-        result = service.CreateUser(username, lastname, firstname, userPassword) #create the user account
-#        service.RetrieveUser(username) #for testing we will check if user exists
-#        result = 'created successfully'
+#       result = service.CreateUser(username, lastname, firstname, userPassword) #create the user account
+        agreedString = str(service.RetrieveUser(username)) #for testing we will check if user exists
+        agreedStart = agreedString.find('agreedToTerms="') + 15 #find the start of the "agreed"
+        agreedMessage = agreedString[agreedStart:5]
+        result = agreedMessage
+#       result = 'created successfully'
     except gdata.apps.service.AppsForYourDomainException , e: #if there is an error
         eString = str(e) #convert the error to a string
         errorStart = eString.find('reason="') + 8 #find the start of the error
