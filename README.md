@@ -8,4 +8,8 @@ Email Address, First Name, Last Name, Password
 
 The script will skip the first row, since we'll assume that is column headers
 
-Requires https://gdata-python-client.googlecode.com/hg/pydocs/gdata.apps.service.html
+Requires https://developers.google.com/admin-sdk/directory/v1/quickstart/quickstart-python
+
+and perhaps 
+
+https://gdata-python-client.googlecode.com/hg/pydocs/gdata.apps.service.html
