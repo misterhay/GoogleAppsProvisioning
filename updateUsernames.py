@@ -15,7 +15,7 @@ print 'There are ', totalRows, ' entries in ', csvFile
 countDown = totalRows #a variable we'll decrement as a count down to completion
 currentRow = 0 #for keeping track of where we are in the CSV file
 
-logFileName = 'addingDotsToAccountsLog' + time.strftime('%Y-%m-%d_%H%M%S') + '.txt' #build a name for the log file
+logFileName = 'updateUsernamesLog' + time.strftime('%Y-%m-%d_%H%M%S') + '.txt' #build a name for the log file
 logFile = open(logFileName, 'a') #create and/or open a log file that we'll append to
 
 importFile = open(csvFile, 'rb') #(re)open the CSV file that we want to parse (since totalRows already looped through it)
